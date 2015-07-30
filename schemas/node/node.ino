@@ -134,7 +134,7 @@ void readDht(int& temperature, int& humidity) {
     // Reading temperature or humidity takes about 250 milliseconds!
     // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
     digitalWrite(DHT_PWR, HIGH); // turn on sensor
-    delay (38); // wait for sensor to stabilize
+    delay (100); // wait for sensor to stabilize
     temperature = dht.readTemperature(); // read temperature as celsius
     humidity = dht.readHumidity(); // read humidity
     // check if returns are valid, if they are NaN (not a number) then something went wrong!
