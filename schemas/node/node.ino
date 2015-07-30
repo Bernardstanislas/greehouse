@@ -20,10 +20,10 @@
 DHT dht(DHT_PIN, DHT_TYPE); // define DHT11
 
 // Battery meter
-#define VOLTAGE_PIN_READ A7 // analogue voltage read pin for batery meter
-#define VOLTAGE_PIN_READ_ENABLE A3 // current sink pin. ( enable voltage divider )
+#define VOLTAGE_PIN_READ A7 // analog voltage read pin for batery meter
+#define VOLTAGE_PIN_READ_ENABLE 3 // current sink pin. ( enable voltage divider )
 #define VOLTAGE_REF 3.3 // reference voltage on system. use to calculate voltage from ADC
-#define VOLTAGE_DIVIDER 2.45 // if you have a voltage divider to read voltages, enter the multiplier here.
+#define VOLTAGE_DIVIDER 3.02 // if you have a voltage divider to read voltages, enter the multiplier here.
 
 // RADIO SETTINGS
 // You will need to initialize the radio by telling it what ID it has and what network it's on
@@ -46,7 +46,8 @@ void setup() {
 
     // // Battery Meter setup
     // pinMode(VOLTAGE_PIN_READ, INPUT);
-    // pinMode(VOLTAGE_PIN_READ_ENABLE, INPUT);
+    // pinMode(VOLTAGE_PIN_READ_ENABLE, OUTPUT);
+    // digitalWrite(VOLTAGE_PIN_READ_ENABLE, LOW);
 
     // // Moisture sensor pin setup
     // pinMode(MOIST_PIN_1, OUTPUT);
@@ -80,6 +81,7 @@ void loop() {
     // printMeasures(moisture, temperature, humidity, voltage, elapsedTime);
     //sleepOneHourMinusOneSecond();
     printDHT(temperature, humidity);
+    // printBatteryVoltage(voltage);
     sleepEightSeconds();
 }
 
@@ -88,14 +90,15 @@ void loop() {
 void readBatteryVoltage(float& voltage) {
     int voltageADC;
     // Battery level check
-    pinMode(VOLTAGE_PIN_READ_ENABLE, OUTPUT); // change pin mode
-    digitalWrite(VOLTAGE_PIN_READ_ENABLE, LOW); // turn on the battery meter (sink current)
+    digitalWrite(VOLTAGE_PIN_READ_ENABLE, HIGH); // turn on the battery meter
+    delay(20);
     for ( int i = 0 ; i < 3 ; i++ ) {
-        delay(48); // delay, wait for circuit to stabalize
+        delay(10); // delay, wait for circuit to stabalize
         voltageADC = analogRead(VOLTAGE_PIN_READ); // read the voltage 3 times. keep last reading
     }
-    voltage = ((voltageADC * VOLTAGE_REF) / 1023) * VOLTAGE_DIVIDER; // calculate the voltage
-    pinMode(VOLTAGE_PIN_READ_ENABLE, INPUT); // turn off the battery meter
+    voltage = voltageADC * VOLTAGE_REF / 1023 * VOLTAGE_DIVIDER; // calculate the voltage
+    digitalWrite(VOLTAGE_PIN_READ_ENABLE, LOW); // turn off the battery meter
+    delay(20);
 }
 
 
@@ -188,6 +191,15 @@ void sleepEightSeconds() {
     LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
 }
 
+/**
+ * Print battery voltage.
+ * @param  {float&} voltage       battery voltage
+ */
+void printBatteryVoltage(float& voltage) {
+    Serial.print("Battery voltage : ");
+    Serial.println(voltage);
+}
+
 // Print DHT measures
 void printDHT(int& temperature, int& humidity) {
     Serial.print("Temperature : ");
@@ -210,3 +222,4 @@ void printMeasures(int moisture, int temperature, int humidity, float voltage, u
     Serial.print("Duration : ");
     Serial.println(duration);
 }
+
