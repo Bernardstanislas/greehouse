@@ -7,9 +7,9 @@
 #include <stdlib.h> // library for maths
 
 // Soil moisture sensor define
-#define MOIST_PIN_1 A2 // soil probe pin 1 with 56kohm resistor
-#define MOIST_PIN_2 7 // soil probe pin 2 with 100ohm resistor
-#define MOIST_READ_PIN_1 A0 // analog read pin. connected to A2 PIN with 56kohm resistor
+#define MOIST_PIN_1 6 // soil probe pin 1
+#define MOIST_PIN_2 7 // soil probe pin 2
+#define MOIST_PIN_READ A0 // analog read pin
 #define MOIST_CYCLES 3 // how many times to read the moisture level. default is 3 times
 
 // DHT Humidity + Temperature sensor define
@@ -49,13 +49,17 @@ void setup() {
     pinMode(VOLTAGE_PIN_READ_ENABLE, OUTPUT);
     digitalWrite(VOLTAGE_PIN_READ_ENABLE, LOW);
 
-    // // Moisture sensor pin setup
-    // pinMode(MOIST_PIN_1, OUTPUT);
-    // pinMode(MOIST_PIN_2, OUTPUT);
-    // pinMode(MOIST_READ_PIN_1, INPUT);
+    // Moisture sensor pin setup
+    pinMode(MOIST_PIN_1, OUTPUT);
+    pinMode(MOIST_PIN_2, OUTPUT);
+    pinMode(MOIST_PIN_READ, INPUT);
+    digitalWrite(MOIST_PIN_1, LOW);
+    digitalWrite(MOIST_PIN_2, LOW);
+
 
     // Humidity sensor setup
     pinMode(DHT_PWR, OUTPUT);
+    digitalWrite(DHT_PWR, LOW);
     dht.begin();
 
     // Radio setup
@@ -69,9 +73,9 @@ void setup() {
 void loop() {
     float voltage;
     readBatteryVoltage(voltage);
-    //
-    // int moisture;
-    // readMoisture(moisture);
+
+    int moisture;
+    readMoisture(moisture);
 
     int temperature;
     int humidity;
@@ -82,6 +86,7 @@ void loop() {
     //sleepOneHourMinusOneSecond();
     printDHT(temperature, humidity);
     printBatteryVoltage(voltage);
+    printMoisture(moisture);
     sleepEightSeconds();
 }
 
@@ -113,14 +118,14 @@ void readMoisture(int& moisture) {
         digitalWrite(MOIST_PIN_1, HIGH);
         digitalWrite(MOIST_PIN_2, LOW);
         delay (moistReadDelay);
-        int moistVal1 = analogRead(MOIST_READ_PIN_1);
+        int moistVal1 = analogRead(MOIST_PIN_READ);
         digitalWrite(MOIST_PIN_1, LOW);
-        delay (moistReadDelay);
+        delay (2);
         // polarity 2 read
         digitalWrite(MOIST_PIN_1, LOW);
         digitalWrite(MOIST_PIN_2, HIGH);
         delay (moistReadDelay);
-        int moistVal2 = analogRead(MOIST_READ_PIN_1);
+        int moistVal2 = analogRead(MOIST_PIN_READ);
         //Make sure all the pins are off to save power
         digitalWrite(MOIST_PIN_2, LOW);
         digitalWrite(MOIST_PIN_1, LOW);
@@ -208,18 +213,8 @@ void printDHT(int& temperature, int& humidity) {
     Serial.println(humidity);
 }
 
-// Send the measures to the serial
-void printMeasures(int moisture, int temperature, int humidity, float voltage, unsigned long duration) {
-    Serial.println();
-    Serial.print("Moisture : ");
+// Print moisture measure
+void printMoisture(int& moisture) {
+    Serial.print("Soil moisture : ");
     Serial.println(moisture);
-    Serial.print("Temperature : ");
-    Serial.println(temperature);
-    Serial.print("Humidity : ");
-    Serial.println(humidity);
-    Serial.print("Voltage : ");
-    Serial.println(voltage);
-    Serial.print("Duration : ");
-    Serial.println(duration);
 }
-
