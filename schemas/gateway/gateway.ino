@@ -9,12 +9,12 @@
 #define NODE_ID        1  // The ID of this node. Has to be unique. 1 is reserved for the gateway!
 #define NETWORK_ID    10  //the network ID we are on
 #define FREQUENCY     RF69_433MHZ
-#define SECRET "cc tu vx voir mb"
+#define SECRET "sixteencharacter"
 
 RFM69 radio; // Define radio
 
 void setup() {
-  // Debug only    
+  // Debug only
   Serial.begin(9600);
   delay(30);
   // Radio setup
