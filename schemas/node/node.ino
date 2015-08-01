@@ -44,10 +44,10 @@ void setup() {
     // Debug only
     Serial.begin(9600);
 
-    // // Battery Meter setup
-    // pinMode(VOLTAGE_PIN_READ, INPUT);
-    // pinMode(VOLTAGE_PIN_READ_ENABLE, OUTPUT);
-    // digitalWrite(VOLTAGE_PIN_READ_ENABLE, LOW);
+    // Battery Meter setup
+    pinMode(VOLTAGE_PIN_READ, INPUT);
+    pinMode(VOLTAGE_PIN_READ_ENABLE, OUTPUT);
+    digitalWrite(VOLTAGE_PIN_READ_ENABLE, LOW);
 
     // // Moisture sensor pin setup
     // pinMode(MOIST_PIN_1, OUTPUT);
@@ -58,17 +58,17 @@ void setup() {
     pinMode(DHT_PWR, OUTPUT);
     dht.begin();
 
-    // // Radio setup
-    // radio.initialize(FREQUENCY,NODE_ID,NETWORK_ID);
-    // radio.setHighPower();
-    // radio.encrypt(SECRET);
-    // radio.promiscuous(false);
-    // radio.sleep();
+    // Radio setup
+    radio.initialize(FREQUENCY,NODE_ID,NETWORK_ID);
+    radio.setHighPower();
+    radio.encrypt(SECRET);
+    radio.promiscuous(false);
+    radio.sleep();
 }
 
 void loop() {
-    // float voltage;
-    // readBatteryVoltage(voltage);
+    float voltage;
+    readBatteryVoltage(voltage);
     //
     // int moisture;
     // readMoisture(moisture);
@@ -81,7 +81,7 @@ void loop() {
     // printMeasures(moisture, temperature, humidity, voltage, elapsedTime);
     //sleepOneHourMinusOneSecond();
     printDHT(temperature, humidity);
-    // printBatteryVoltage(voltage);
+    printBatteryVoltage(voltage);
     sleepEightSeconds();
 }
 
@@ -137,7 +137,7 @@ void readDht(int& temperature, int& humidity) {
     // Reading temperature or humidity takes about 250 milliseconds!
     // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
     digitalWrite(DHT_PWR, HIGH); // turn on sensor
-    delay (100); // wait for sensor to stabilize
+    delay (10000); // wait for sensor to stabilize
     temperature = dht.readTemperature(); // read temperature as celsius
     humidity = dht.readHumidity(); // read humidity
     // check if returns are valid, if they are NaN (not a number) then something went wrong!
