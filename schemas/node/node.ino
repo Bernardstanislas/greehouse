@@ -9,8 +9,14 @@
 // Soil moisture sensor define
 #define MOIST_PIN_1 6 // soil probe pin 1
 #define MOIST_PIN_2 7 // soil probe pin 2
-#define MOIST_PIN_READ A0 // analog read pin
+#define MOIST_PIN_READ A6 // analog read pin
 #define MOIST_CYCLES 3 // how many times to read the moisture level. default is 3 times
+
+// Rain sensor define
+#define RAIN_PIN_1 8 // rain probe pin 1
+#define RAIN_PIN_2 10 // rain probe pin 2
+#define RAIN_PIN_READ A5 // analog read pin
+#define RAIN_CYCLES 3 // how many times to read the rain level. default is 3 times
 
 // DHT Humidity + Temperature sensor define
 #define DHT_PIN 5 // Data pin (D5) for DHT
@@ -56,6 +62,12 @@ void setup() {
     digitalWrite(MOIST_PIN_1, LOW);
     digitalWrite(MOIST_PIN_2, LOW);
 
+    // Rain sensor pin setup
+    pinMode(RAIN_PIN_1, OUTPUT);
+    pinMode(RAIN_PIN_2, OUTPUT);
+    pinMode(RAIN_PIN_READ, INPUT);
+    digitalWrite(RAIN_PIN_1, LOW);
+    digitalWrite(RAIN_PIN_2, LOW);
 
     // Humidity sensor setup
     pinMode(DHT_PWR, OUTPUT);
