@@ -13,8 +13,8 @@
 #define MOIST_CYCLES 3 // how many times to read the moisture level. default is 3 times
 
 // Rain sensor define
-#define RAIN_PIN_1 8 // rain probe pin 1
-#define RAIN_PIN_2 10 // rain probe pin 2
+#define RAIN_PIN_1 12 // rain probe pin 1
+#define RAIN_PIN_2 13 // rain probe pin 2
 #define RAIN_PIN_READ A5 // analog read pin
 #define RAIN_CYCLES 3 // how many times to read the rain level. default is 3 times
 
