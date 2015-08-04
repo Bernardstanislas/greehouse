@@ -13,8 +13,8 @@
 #define MOIST_CYCLES 3 // how many times to read the moisture level. default is 3 times
 
 // Rain sensor define
-#define RAIN_PIN_1 12 // rain probe pin 1
-#define RAIN_PIN_2 13 // rain probe pin 2
+#define RAIN_PIN_1 11 // rain probe pin 1
+#define RAIN_PIN_2 12 // rain probe pin 2
 #define RAIN_PIN_READ A5 // analog read pin
 #define RAIN_CYCLES 3 // how many times to read the rain level. default is 3 times
 
@@ -90,16 +90,20 @@ void loop() {
     int moisture;
     readMoisture(moisture);
 
+    int rain;
+    readRain(rain);
+
     int temperature;
     int humidity;
     readDht(temperature, humidity);
 
-    transmitMeasures(moisture, temperature, humidity, voltage);
+    transmitMeasures(moisture, rain, temperature, humidity, voltage);
     //sleepOneHourMinusOneSecond();
 
     // printDHT(temperature, humidity);
     // printBatteryVoltage(voltage);
     // printMoisture(moisture);
+    // printRain(rain);
     sleepEightSeconds();
 }
 
@@ -138,13 +142,41 @@ void readMoisture(int& moisture) {
         digitalWrite(MOIST_PIN_2, HIGH);
         delay (moistReadDelay);
         int moistVal2 = analogRead(MOIST_PIN_READ);
-        //Make sure all the pins are off to save power
+        // Make sure all the pins are off to save power
         digitalWrite(MOIST_PIN_2, LOW);
         digitalWrite(MOIST_PIN_1, LOW);
         moistVal1 = 1023 - moistVal1; // invert the reading
         moistAvgValue += (moistVal1 + moistVal2) / 2; // average readings. report the levels
     }
     moisture = moistAvgValue / MOIST_CYCLES; // average the results
+}
+
+// Rain sensor reading function
+// function reads 3 times and averages the data
+void readRain(int& rain) {
+    // Rain sensor reading
+    int rainAvgValue = 0; // reset the rain level before reading
+    for ( int rainReadCount = 0; rainReadCount < RAIN_CYCLES; rainReadCount++ ) {
+        int rainReadDelay = 88; // delay to reduce capacitive effects
+        // polarity 1 read
+        digitalWrite(RAIN_PIN_1, HIGH);
+        digitalWrite(RAIN_PIN_2, LOW);
+        delay (rainReadDelay);
+        int rainVal1 = analogRead(RAIN_PIN_READ);
+        digitalWrite(RAIN_PIN_1, LOW);
+        delay (2);
+        // polarity 2 read
+        digitalWrite(RAIN_PIN_1, LOW);
+        digitalWrite(RAIN_PIN_2, HIGH);
+        delay (rainReadDelay);
+        int rainVal2 = analogRead(RAIN_PIN_READ);
+        // Make sure all the pins are off to save power
+        digitalWrite(RAIN_PIN_2, LOW);
+        digitalWrite(RAIN_PIN_1, LOW);
+        rainVal1 = 1023 - rainVal1; // invert the reading
+        rainAvgValue += (rainVal1 + rainVal2) / 2; // average readings. report the levels
+    }
+    rain = rainAvgValue / RAIN_CYCLES; // average the results
 }
 
 // DHT sensor reading function
@@ -167,11 +199,13 @@ void readDht(int& temperature, int& humidity) {
 }
 
 // Transmit the measures by radio
-void transmitMeasures(int moisture, int temperature, int humidity, int voltage) {
+void transmitMeasures(int moisture, int rain, int temperature, int humidity, int voltage) {
     // PREPARE READINGS FOR TRANSMISSION
     String senseData = String(NODE_ID);
     senseData += ":";
     senseData += String(moisture);
+    senseData += ":";
+    senseData += String(rain);
     senseData += ":";
     senseData += String(temperature);
     senseData += ":";
@@ -226,5 +260,11 @@ void printDHT(int& temperature, int& humidity) {
 void printMoisture(int& moisture) {
     Serial.print("Soil moisture : ");
     Serial.println(moisture);
+}
+
+// Print rain measure
+void printRain(int& rain) {
+    Serial.print("Rain : ");
+    Serial.println(rain);
 }
 
